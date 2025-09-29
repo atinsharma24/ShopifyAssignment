@@ -1,0 +1,60 @@
+Shopify Developer Assignment Brief
+Figma Link:
+https://www.figma.com/design/0HdAlFWznVMeqt19ul7HDa/Shopify-Assignment-New?node-id
+=1-384&t=27lpzstn17DHvnqO-Q
+Obiective:
+Develop a fully functional, dynamic product page in Shopify that mirrors the provided Figma
+design. All product variations, pricing, and subscription details must be pulled from the Shopify
+backend. The page should support a rich, interactive Ul while maintaining performance and
+responsive behavior.
+Scope of Work
+1. Product Media Gallery
+Implement a product image carousel.
+Thumbnail click should update the main image dynamically
+Images should reflect selected product variants (e.g.,color/flavor)
+2. Purchase Options (Radio Group with Dynamic ui)
+Implement two purchase modes as radio buttons:
+-Single Drink Subscription-Double Drink Subscription
+Each selection should dynamically update flavor selectors and pricing.
+Show included items, discounts, and benefits per mode.(should come from product details
+in the Shopify backend)
+Reflect correct variants from the Shopify backend.
+The Subscription Price should be 25% off from the Main Price. Plus all the items will have a
+20% sales discount. So, For example, if Main Price is $100, then the subscription main price
+will be $75. and after 20% sales discount on both, the final pricing will become (20% on $100
+=$80）.
+3. Flavor Selection
+Allow selection of Chocolate, Vanilla, Orange via image swatches
+Single Drink: 1 flavor selector
+Double Drink: 2 selectors (Flavor 1 and Flavor 2)
+selections must reflect appropriate variants and be required to proceed.
+
+
+
+4. Dynamic Pricing & Discounts
+Pull pricing from Shopify including compare-at-price for discounts
+Prices should adjust in real-time based on user selections.
+Display both current and original prices where applicable
+5."What's Included" Box
+Update content based on the selected mode
+Show delivery frequency, included items, and bullet-point benefits
+Manage content via metafields for each mode.
+6. Add to Cart Logic
+The "single drink subscription'" with chocolate flavor will be selected by default and the
+button on page load should have the function to add that variant in cart.
+For other selections,Add the correct variant(s) to cart based on selection.
+Ensure accurate reflection in the cart.
+Deliverables
+Functional Shopify product page (in a dev theme or Shopify dev store)
+Fully dynamic interaction (no hardcoded variations or pricing).
+Clean, maintainable code (Liquid, JS, CsS/SCSS)
+Documentation: Overview, data source details, and setup instructions.
+Evaluation Criteria
+Accurate implementation of the Figma design.
+Dynamic variant and pricing logic using Shopify backend.
+Responsive, accessible, and performant code.
+Ul interactivity and state logic quality.
+Clear documentation and clean code structure
+Timeline
+Expected duration: 3 days
+Please submit live shopify link with password
