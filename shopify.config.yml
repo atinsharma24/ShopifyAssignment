@@ -1,0 +1,59 @@
+# Shopify Configuration
+# This file configures the Shopify CLI for theme development
+
+# Store configuration
+# Replace with your actual development store URL
+# Example: my-dev-store.myshopify.com
+store: ""
+
+# Theme configuration  
+theme:
+  # Theme ID (leave empty to use development theme)
+  id: ""
+  
+  # Theme name (optional)
+  name: "Shopify Assignment Theme"
+  
+  # Theme directory
+  directory: "theme"
+
+# Development configuration
+development:
+  # Automatically open browser when running theme dev
+  open_browser: true
+  
+  # Port for local development server
+  port: 9292
+  
+  # Host for local development server  
+  host: "127.0.0.1"
+  
+  # Enable live reload
+  live_reload: true
+  
+  # Notify on file changes
+  notify: true
+
+# Theme check configuration
+theme_check:
+  # Enable theme check
+  enabled: true
+  
+  # Theme check configuration file
+  config: ".theme-check.yml"
+
+# Deployment configuration
+deployment:
+  # Ignore patterns for deployment
+  ignore:
+    - "*.scss"
+    - "*.map"
+    - "node_modules/"
+    - ".git/"
+    - ".vscode/"
+    - "tests/"
+    - "coverage/"
+    - "README.md"
+    - "package*.json"
+    - "playwright.config.js"
+    - ".env*"

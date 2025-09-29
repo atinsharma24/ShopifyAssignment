@@ -1,0 +1,88 @@
+{
+  "name": "shopify-assignment-theme",
+  "version": "1.0.0",
+  "description": "Shopify developer assignment - Product page with dynamic variants, subscription logic, and pricing",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm:watch:scss\" \"shopify theme dev\"",
+    "watch:scss": "sass --watch theme/assets/product.scss:theme/assets/product.css",
+    "build": "sass theme/assets/product.scss:theme/assets/product.css && babel src --out-dir theme/assets --copy-files",
+    "lint": "eslint . && stylelint \"theme/assets/**/*.css\"",
+    "test:unit": "jest",
+    "test:e2e": "playwright test",
+    "theme:deploy": "shopify theme push --allow-live --password=$SHOPIFY_PASSWORD --store=$SHOPIFY_STORE",
+    "theme:check": "shopify theme check"
+  },
+  "keywords": ["shopify", "theme", "liquid", "ecommerce"],
+  "author": "Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.22.0",
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "@playwright/test": "^1.36.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.44.0",
+    "jest": "^29.6.0",
+    "jest-environment-jsdom": "^29.6.0",
+    "sass": "^1.63.0",
+    "stylelint": "^15.10.0",
+    "stylelint-config-standard": "^34.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testMatch": [
+      "<rootDir>/tests/unit/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "theme/assets/*.js",
+      "!src/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"]
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "jest": true,
+      "node": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "globals": {
+      "createMockProduct": "readonly",
+      "createTestDOM": "readonly",
+      "suppressConsoleErrorsAndWarnings": "readonly",
+      "restoreConsole": "readonly"
+    },
+    "ignorePatterns": [
+      "node_modules/",
+      "dist/",
+      "coverage/",
+      "theme/assets/js/",
+      "*.min.js"
+    ]
+  },
+  "stylelint": {
+    "extends": "stylelint-config-standard",
+    "rules": {
+      "selector-class-pattern": null,
+      "color-hex-length": null,
+      "media-feature-range-notation": null,
+      "color-function-notation": null,
+      "alpha-value-notation": null,
+      "no-descending-specificity": null,
+      "declaration-block-no-redundant-longhand-properties": null,
+      "comment-empty-line-before": null,
+      "rule-empty-line-before": null,
+      "at-rule-empty-line-before": null,
+      "selector-attribute-quotes": null
+    }
+  }
+}

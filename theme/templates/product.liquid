@@ -1,0 +1,98 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+
+    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+
+    <title>
+      {{ product.title | escape }}
+      {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endif -%}
+    </title>
+
+    {% if product.description != blank %}
+      <meta name="description" content="{{ product.description | strip_html | truncate: 160 | escape }}">
+    {% endif %}
+
+    {% render 'meta-tags' %}
+
+    <script src="{{ 'product.js' | asset_url }}" defer="defer"></script>
+    {{ 'product.css' | asset_url | stylesheet_tag }}
+
+    {%- liquid
+      assign chosen_variant = product.selected_or_first_available_variant
+      assign featured_image = chosen_variant.featured_image | default: product.featured_image
+    -%}
+
+    <script type="application/ld+json">
+      {
+        "@context": "http://schema.org/",
+        "@type": "Product",
+        "name": {{ product.title | json }},
+        "url": {{ request.origin | append: product.url | json }},
+        {% if product.featured_image %}
+          {% assign image_size = product.featured_image.width | append: 'x' %}
+          "image": [
+            {{ product.featured_image | image_url: image_size | prepend: "https:" | json }}
+          ],
+        {% endif %}
+        "description": {{ product.description | strip_html | json }},
+        {% if product.selected_or_first_available_variant.sku != blank %}
+          "sku": {{ product.selected_or_first_available_variant.sku | json }},
+        {% endif %}
+        "brand": {
+          "@type": "Brand",
+          "name": {{ product.vendor | json }}
+        },
+        "offers": [
+          {%- for variant in product.variants -%}
+            {
+              "@type" : "Offer",
+              {%- if variant.sku != blank -%}
+                "sku": {{ variant.sku | json }},
+              {%- endif -%}
+              "availability" : "http://schema.org/{% if variant.available %}InStock{% else %}OutOfStock{% endif %}",
+              "price" : {{ variant.price | divided_by: 100.00 | json }},
+              "priceCurrency" : {{ cart.currency.iso_code | json }},
+              "url" : {{ request.origin | append: variant.url | json }}
+            }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ]
+      }
+    </script>
+  </head>
+
+  <body class="gradient">
+    <a class="skip-to-content-link button visually-hidden" href="#MainContent">
+      Skip to content
+    </a>
+
+    <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      {% section 'product-main' %}
+    </main>
+
+    <script>
+      // Embed product data for JavaScript access
+      window.productData = {{ product | json }};
+      
+      // Initialize the product page when DOM is loaded
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.ProductPage) {
+          window.ProductPage.init();
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    "shopify.liquid",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-eslint",
+    "stylelint.vscode-stylelint",
+    "ms-playwright.playwright",
+    "glenn2223.live-sass",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "ms-vscode.vscode-typescript-next",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker",
+    "gruntfuggly.todo-tree",
+    "ms-vscode.test-adapter-converter",
+    "hbenl.vscode-test-explorer"
+  ]
+}

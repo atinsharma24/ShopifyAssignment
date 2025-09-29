@@ -1,0 +1,65 @@
+{%- liquid
+  assign variant_images = variant.featured_media | default: product.featured_media
+-%}
+
+<div class="product__media-gallery" id="MediaGallery-{{ section.id }}" role="region" aria-label="Gallery Viewer" tabindex="-1">
+  <div class="product__media-list">
+    {%- if product.media.size > 0 -%}
+      {%- for media in product.media -%}
+        <div class="product__media-item{% if media.id == variant_images.id %} product__media-item--active{% endif %}" 
+             data-media-id="{{ media.id }}">
+          {%- case media.media_type -%}
+            {%- when 'image' -%}
+              <img src="{{ media | image_url: width: 600 }}"
+                   alt="{{ media.alt | escape }}"
+                   class="product__media-image"
+                   width="{{ media.width }}"
+                   height="{{ media.height }}"
+                   loading="lazy">
+            {%- when 'video' -%}
+              <video controls class="product__media-video">
+                <source src="{{ media.sources[1].url }}" type="{{ media.sources[1].mime_type }}">
+                Your browser does not support the video tag.
+              </video>
+            {%- when 'external_video' -%}
+              {%- if media.host == 'youtube' -%}
+                <iframe src="https://www.youtube.com/embed/{{ media.external_id }}"
+                        class="product__media-iframe"
+                        frameborder="0" 
+                        allowfullscreen>
+                </iframe>
+              {%- elsif media.host == 'vimeo' -%}
+                <iframe src="https://player.vimeo.com/video/{{ media.external_id }}"
+                        class="product__media-iframe"
+                        frameborder="0" 
+                        allowfullscreen>
+                </iframe>
+              {%- endif -%}
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <div class="product__media-item product__media-item--placeholder">
+        {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+      </div>
+    {%- endif -%}
+  </div>
+
+  {%- if product.media.size > 1 -%}
+    <div class="product__media-thumbnails">
+      {%- for media in product.media -%}
+        <button type="button" 
+                class="product__media-thumbnail{% if media.id == variant_images.id %} product__media-thumbnail--active{% endif %}"
+                data-media-id="{{ media.id }}"
+                aria-label="Load image {{ forloop.index }} in gallery view">
+          <img src="{{ media | image_url: width: 100 }}"
+               alt="{{ media.alt | escape }}"
+               class="product__media-thumbnail-image"
+               width="100"
+               height="100"
+               loading="lazy">
+        </button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
