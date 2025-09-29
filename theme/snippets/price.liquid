@@ -1,0 +1,79 @@
+{%- liquid
+  if use_variant
+    assign target = product.selected_or_first_available_variant
+  else
+    assign target = product
+  endif
+
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+  assign available = target.available | default: false
+  assign money_price = price | money
+  assign money_price_min = product.price_min | money
+  assign money_price_max = product.price_max | money
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+    assign money_price_min = product.price_min | money_with_currency
+    assign money_price_max = product.price_max | money_with_currency
+  endif
+
+  if target == product and product.price_varies
+    assign money_price = 'products.product.price.from_price_html' | t: price: money_price
+  endif
+-%}
+
+<div class="price
+  {%- if price_class %} {{ price_class }}{% endif -%}
+  {%- if available == false %} price--sold-out {% endif -%}
+  {%- if compare_at_price > price %} price--on-sale {% endif -%}
+  {%- if product.price_varies == false and product.compare_at_price_varies %} price--no-compare{% endif -%}
+  {%- if show_badges %} price--show-badge{% endif -%}">
+  
+  <div class="price__container">
+    {%- comment -%}
+      Display pricing with subscription and site-wide discounts
+      Main price: original price with 20% site-wide discount
+      Subscription price: 25% subscription discount + 20% site-wide discount (60% of original)
+    {%- endcomment -%}
+    
+    <!-- Main Purchase Price (One-time purchase with 20% discount) -->
+    <dl class="price__main-price">
+      <dt class="visually-hidden">Regular price</dt>
+      <dd>
+        <span class="price__main-label">One-time Purchase:</span>
+        <span class="price__main-amount" data-price-type="main" data-original-price="{{ price }}">
+          {{ money_price }}
+        </span>
+        {%- if compare_at_price > price -%}
+          <span class="price__compare-price">
+            <span class="visually-hidden">Regular price</span>
+            {{ compare_at_price | money }}
+          </span>
+        {%- endif -%}
+      </dd>
+    </dl>
+
+    <!-- Subscription Price (25% + 20% discount = 60% of original) -->
+    <dl class="price__subscription-price">
+      <dt class="visually-hidden">Subscription price</dt>
+      <dd>
+        <span class="price__subscription-label">Subscription Price:</span>
+        <span class="price__subscription-amount" data-price-type="subscription" data-original-price="{{ price }}">
+          {{ price | times: 0.60 | round | money }}
+        </span>
+        <span class="price__subscription-savings">Save 40%</span>
+      </dd>
+    </dl>
+  </div>
+
+  {%- if show_badges -%}
+    <span class="badge price__badge-sale color-{{ settings.sale_badge_color_scheme }}">
+      {%- render 'icon-sale' -%}
+      {{ 'products.product.on_sale' | t }}
+    </span>
+
+    <span class="badge price__badge-sold-out color-{{ settings.sold_out_badge_color_scheme }}">
+      {{ 'products.product.sold_out' | t }}
+    </span>
+  {%- endif -%}
+</div>

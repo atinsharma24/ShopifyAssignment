@@ -1,0 +1,196 @@
+{%- liquid
+  assign chosen_variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+-%}
+
+<section class="section-{{ section.id }}-padding">
+  <div class="product page-width">
+    <div class="product__media-container">
+      {% render 'product-media-gallery', variant: chosen_variant, media: product.media %}
+    </div>
+    
+    <div class="product__details">
+      <div class="product__info">
+        <h1 class="product__title">
+          {{ product.title | escape }}
+        </h1>
+        
+        <div class="product__price">
+          <div class="price-container" id="price-{{ section.id }}">
+            {% render 'price', product: product, use_variant: true, show_badges: true %}
+          </div>
+        </div>
+
+        <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data" id="{{ product_form_id }}" class="form" novalidate="novalidate" data-type="add-to-cart-form">
+          
+          <!-- Purchase Mode Selection -->
+          <div class="product-form__subscription-mode">
+            <fieldset class="subscription-mode-fieldset">
+              <legend class="subscription-mode-legend">Purchase Mode</legend>
+              
+              <div class="subscription-mode-options">
+                <div class="subscription-mode-option">
+                  <input type="radio" 
+                         id="mode-single" 
+                         name="purchase_mode" 
+                         value="single" 
+                         checked
+                         class="subscription-mode-input visually-hidden"
+                         aria-describedby="mode-single-description">
+                  <label for="mode-single" class="subscription-mode-label">
+                    <span class="subscription-mode-title">Single Drink Subscription</span>
+                    <span class="subscription-mode-description" id="mode-single-description">
+                      One flavor per delivery
+                    </span>
+                  </label>
+                </div>
+                
+                <div class="subscription-mode-option">
+                  <input type="radio" 
+                         id="mode-double" 
+                         name="purchase_mode" 
+                         value="double" 
+                         class="subscription-mode-input visually-hidden"
+                         aria-describedby="mode-double-description">
+                  <label for="mode-double" class="subscription-mode-label">
+                    <span class="subscription-mode-title">Double Drink Subscription</span>
+                    <span class="subscription-mode-description" id="mode-double-description">
+                      Two flavors per delivery
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
+          <!-- Flavor Selection -->
+          <div class="product-form__flavor-selection">
+            <div class="flavor-selection-container">
+              <h3 class="flavor-selection-title">Select Your Flavor(s)</h3>
+              
+              <!-- Single Flavor Selector -->
+              <div class="flavor-selector" id="flavor-selector-1" data-selector="1">
+                <h4 class="flavor-selector-title">Flavor</h4>
+                <div class="flavor-options">
+                  {% assign flavors = 'Chocolate,Vanilla,Orange' | split: ',' %}
+                  {% for flavor in flavors %}
+                    <div class="flavor-option">
+                      <input type="radio" 
+                             id="flavor-1-{{ flavor | downcase }}" 
+                             name="flavor_1" 
+                             value="{{ flavor }}" 
+                             class="flavor-input visually-hidden"
+                             {% if flavor == 'Chocolate' %}checked{% endif %}
+                             aria-describedby="flavor-1-{{ flavor | downcase }}-description">
+                      <label for="flavor-1-{{ flavor | downcase }}" class="flavor-label">
+                        <div class="flavor-swatch flavor-swatch--{{ flavor | downcase }}"></div>
+                        <span class="flavor-name">{{ flavor }}</span>
+                      </label>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Double Flavor Selector (hidden by default) -->
+              <div class="flavor-selector flavor-selector--hidden" id="flavor-selector-2" data-selector="2">
+                <h4 class="flavor-selector-title">Flavor 2</h4>
+                <div class="flavor-options">
+                  {% for flavor in flavors %}
+                    <div class="flavor-option">
+                      <input type="radio" 
+                             id="flavor-2-{{ flavor | downcase }}" 
+                             name="flavor_2" 
+                             value="{{ flavor }}" 
+                             class="flavor-input visually-hidden"
+                             aria-describedby="flavor-2-{{ flavor | downcase }}-description">
+                      <label for="flavor-2-{{ flavor | downcase }}" class="flavor-label">
+                        <div class="flavor-swatch flavor-swatch--{{ flavor | downcase }}"></div>
+                        <span class="flavor-name">{{ flavor }}</span>
+                      </label>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden variant selector for Shopify -->
+          <div class="product-form__input product-form__input--hidden">
+            <select name="id" id="Variants-{{ section.id }}" class="select__select" form="{{ product_form_id }}">
+              {%- for variant in product.variants -%}
+                <option
+                  value="{{ variant.id }}"
+                  {% if variant == chosen_variant %}selected="selected"{% endif %}
+                  {% if variant.available == false %}disabled{% endif %}
+                >
+                  {{ variant.title }}
+                  {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+                  - {{ variant.price | money | strip_html }}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+
+          <!-- What's Included Section -->
+          <div class="product-form__whats-included">
+            <div class="whats-included-container" id="whats-included">
+              {% if product.metafields.subscription.single %}
+                <div class="whats-included-content" data-mode="single">
+                  {{ product.metafields.subscription.single | metafield_tag }}
+                </div>
+              {% endif %}
+              
+              {% if product.metafields.subscription.double %}
+                <div class="whats-included-content whats-included-content--hidden" data-mode="double">
+                  {{ product.metafields.subscription.double | metafield_tag }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Add to Cart -->
+          <div class="product-form__buttons">
+            <button
+              type="submit"
+              name="add"
+              class="btn product-form__cart-submit{% if product.selected_or_first_available_variant.available == false %} disabled{% endif %}"
+              {% if product.selected_or_first_available_variant.available == false %}disabled{% endif %}
+              aria-describedby="cart-errors-{{ section.id }}"
+            >
+              <span>
+                {%- if product.selected_or_first_available_variant.available -%}
+                  Add to cart
+                {%- else -%}
+                  Sold out
+                {%- endif -%}
+              </span>
+              <div class="loading-overlay hidden">
+                <div class="loading-overlay__spinner">
+                  <svg aria-hidden="true" focusable="false" role="presentation" class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                    <circle class="path" fill="none" stroke-width="6" cx="33" cy="33" r="30"></circle>
+                  </svg>
+                </div>
+              </div>
+            </button>
+          </div>
+          
+          <div id="cart-errors-{{ section.id }}" class="form__message" role="alert" hidden></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product Main",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product Information"
+    }
+  ]
+}
+{% endschema %}
