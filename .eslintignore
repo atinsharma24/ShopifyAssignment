@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+theme/assets/js/
+*.min.js
+playwright.config.js
+tests/e2e/

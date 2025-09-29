@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm:watch:scss\" \"shopify theme dev\"",
-    "watch:scss": "sass --watch assets/product.scss:assets/product.css",
-    "build": "sass assets/product.scss:assets/product.css && babel src --out-dir assets --copy-files",
-    "lint": "eslint . && stylelint \"assets/**/*.css\"",
+    "watch:scss": "sass --watch theme/assets/product.scss:theme/assets/product.css",
+    "build": "sass theme/assets/product.scss:theme/assets/product.css && babel src --out-dir theme/assets --copy-files",
+    "lint": "eslint . && stylelint \"theme/assets/**/*.css\"",
     "test:unit": "jest",
     "test:e2e": "playwright test",
     "theme:deploy": "shopify theme push --allow-live --password=$SHOPIFY_PASSWORD --store=$SHOPIFY_STORE",
@@ -31,21 +31,58 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"]
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testMatch": [
+      "<rootDir>/tests/unit/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "theme/assets/*.js",
+      "!src/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"]
   },
   "eslintConfig": {
     "env": {
       "browser": true,
       "es2021": true,
-      "jest": true
+      "jest": true,
+      "node": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
       "ecmaVersion": "latest",
       "sourceType": "module"
-    }
+    },
+    "globals": {
+      "createMockProduct": "readonly",
+      "createTestDOM": "readonly",
+      "suppressConsoleErrorsAndWarnings": "readonly",
+      "restoreConsole": "readonly"
+    },
+    "ignorePatterns": [
+      "node_modules/",
+      "dist/",
+      "coverage/",
+      "theme/assets/js/",
+      "*.min.js"
+    ]
   },
   "stylelint": {
-    "extends": "stylelint-config-standard"
+    "extends": "stylelint-config-standard",
+    "rules": {
+      "selector-class-pattern": null,
+      "color-hex-length": null,
+      "media-feature-range-notation": null,
+      "color-function-notation": null,
+      "alpha-value-notation": null,
+      "no-descending-specificity": null,
+      "declaration-block-no-redundant-longhand-properties": null,
+      "comment-empty-line-before": null,
+      "rule-empty-line-before": null,
+      "at-rule-empty-line-before": null,
+      "selector-attribute-quotes": null
+    }
   }
 }

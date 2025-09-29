@@ -4,7 +4,7 @@
 class VariantManager {
   constructor(productData) {
     this.product = productData || {};
-    this.variants = (productData && productData.variants) || [];
+    this.variants = productData && productData.variants || [];
   }
 
   /**
@@ -33,7 +33,6 @@ class VariantManager {
       // Fallback: return the first flavor's variant (customize this logic as needed)
       return this.findVariantByTitle(selections.flavors[0]);
     }
-
     return null;
   }
 
@@ -51,11 +50,8 @@ class VariantManager {
 
       // Check variant options
       if (variant.options) {
-        return variant.options.some(option => 
-          option && option.toLowerCase().includes(flavor.toLowerCase())
-        );
+        return variant.options.some(option => option && option.toLowerCase().includes(flavor.toLowerCase()));
       }
-
       return false;
     }) || null;
   }
@@ -73,10 +69,7 @@ class VariantManager {
       const variantText = (variant.title || '').toLowerCase();
       const optionsText = (variant.options || []).join(' ').toLowerCase();
       const searchText = variantText + ' ' + optionsText;
-
-      return flavors.every(flavor => 
-        searchText.includes(flavor.toLowerCase())
-      );
+      return flavors.every(flavor => searchText.includes(flavor.toLowerCase()));
     }) || null;
   }
 
@@ -88,12 +81,11 @@ class VariantManager {
    */
   getCartItems(selections) {
     const items = [];
-    
+
     // Validate selections structure
     if (!selections || !selections.mode || !selections.flavors || !Array.isArray(selections.flavors)) {
       return items;
     }
-    
     if (selections.mode === 'single' && selections.flavors.length >= 1) {
       const variant = this.findVariantByTitle(selections.flavors[0]);
       if (variant) {
@@ -109,7 +101,6 @@ class VariantManager {
     } else if (selections.mode === 'double') {
       // For double mode, try combination variant first
       const combinationVariant = this.findCombinationVariant(selections.flavors);
-      
       if (combinationVariant) {
         // Add single combination variant
         items.push({
@@ -138,7 +129,6 @@ class VariantManager {
         });
       }
     }
-
     return items;
   }
 
@@ -149,19 +139,15 @@ class VariantManager {
    */
   validateSelections(selections) {
     const errors = [];
-
     if (!selections.mode) {
       errors.push('Please select a purchase mode');
     }
-
     if (!selections.flavors || selections.flavors.length === 0) {
       errors.push('Please select at least one flavor');
     }
-
     if (selections.mode === 'single' && selections.flavors.length !== 1) {
       errors.push('Single mode requires exactly one flavor selection');
     }
-
     if (selections.mode === 'double' && selections.flavors.length < 2) {
       errors.push('Double mode requires two flavor selections');
     }
@@ -175,7 +161,6 @@ class VariantManager {
         errors.push('Selected variant is currently sold out');
       }
     }
-
     return {
       valid: errors.length === 0,
       errors: errors
@@ -189,18 +174,15 @@ class VariantManager {
   getAvailableFlavors() {
     const flavors = new Set();
     const knownFlavors = ['Chocolate', 'Vanilla', 'Orange'];
-
     this.variants.forEach(variant => {
       knownFlavors.forEach(flavor => {
         const variantText = (variant.title || '').toLowerCase();
         const optionsText = (variant.options || []).join(' ').toLowerCase();
-        if (variantText.includes(flavor.toLowerCase()) || 
-            optionsText.includes(flavor.toLowerCase())) {
+        if (variantText.includes(flavor.toLowerCase()) || optionsText.includes(flavor.toLowerCase())) {
           flavors.add(flavor);
         }
       });
     });
-
     return Array.from(flavors);
   }
 }

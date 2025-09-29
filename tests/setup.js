@@ -3,8 +3,7 @@
  * Configures the testing environment and global utilities
  */
 
-// Set up jsdom environment
-import 'jest-environment-jsdom';
+// Set up jsdom environment (this is configured in jest config)
 
 // Mock Shopify global objects
 global.Shopify = {

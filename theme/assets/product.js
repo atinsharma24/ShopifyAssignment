@@ -23,11 +23,19 @@ window.ProductPage = (function() {
       return;
     }
 
-    // Initialize modules
-    variantManager = new VariantManager(productData);
-    pricing = new Pricing();
-    mediaGallery = new MediaGallery();
-    cartApi = new CartApi();
+    // Initialize modules (check if classes are available)
+    if (window.VariantManager) {
+      variantManager = new window.VariantManager(productData);
+    }
+    if (window.Pricing) {
+      pricing = new window.Pricing();
+    }
+    if (window.MediaGallery) {
+      mediaGallery = new window.MediaGallery();
+    }
+    if (window.CartApi) {
+      cartApi = new window.CartApi();
+    }
 
     // Set up event listeners
     setupEventListeners();
@@ -92,7 +100,7 @@ window.ProductPage = (function() {
   /**
    * Handle purchase mode change (single/double)
    */
-  function handleModeChange(event) {
+  function handleModeChange() {
     updateFlavorSelectors();
     updateVariantAndPricing();
     updateWhatsIncluded();
@@ -101,7 +109,7 @@ window.ProductPage = (function() {
   /**
    * Handle flavor selection change
    */
-  function handleFlavorChange(event) {
+  function handleFlavorChange() {
     updateVariantAndPricing();
   }
 
