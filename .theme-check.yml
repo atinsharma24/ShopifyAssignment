@@ -1,0 +1,69 @@
+# Theme Check Configuration
+# https://shopify.dev/docs/themes/tools/theme-check
+
+# Exclude patterns
+exclude:
+  - node_modules/
+  - dist/
+  - coverage/
+  - test-results/
+  - "*.map"
+
+# Theme Check rules configuration
+extends: theme
+
+# Custom rule configurations
+DeprecateLazysizes: 
+  enabled: false
+  
+UndefinedObject:
+  enabled: true
+  exclude:
+    - snippets/
+    
+UnusedAssign:
+  enabled: true
+  
+ParserBlockingJavaScript:
+  enabled: true
+  
+AssetSizeCSS:
+  enabled: true
+  threshold_in_bytes: 100000
+  
+AssetSizeJavaScript:
+  enabled: true
+  threshold_in_bytes: 10000
+  
+RemoteAsset:
+  enabled: true
+  
+MissingTemplate:
+  enabled: true
+  
+UnknownFilter:
+  enabled: true
+  
+RequiredLayoutThemeObject:
+  enabled: true
+  
+ValidHTMLTranslation:
+  enabled: true
+  
+TranslationKeyExists:
+  enabled: false
+  
+SyntaxError:
+  enabled: true
+  
+LiquidTag:
+  enabled: true
+  
+MatchingTranslations:
+  enabled: false
+  
+DefaultLocale:
+  enabled: true
+  
+ValidJSON:
+  enabled: true
