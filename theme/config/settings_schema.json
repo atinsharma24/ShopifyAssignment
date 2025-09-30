@@ -1,0 +1,72 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Shopify Assignment Theme",
+    "theme_version": "1.0.0",
+    "theme_author": "Developer",
+    "theme_documentation_url": "https://github.com/atinsharma24/ShopifyAssignment",
+    "theme_support_url": "https://github.com/atinsharma24/ShopifyAssignment/issues"
+  },
+  {
+    "name": "Product Settings",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Product Page Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_subscription_mode",
+        "label": "Enable Subscription Mode",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "subscription_discount",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "%",
+        "label": "Subscription Discount",
+        "default": 25
+      },
+      {
+        "type": "range",
+        "id": "site_wide_discount",
+        "min": 0,
+        "max": 50,
+        "step": 5,
+        "unit": "%",
+        "label": "Site-wide Discount",
+        "default": 20
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Theme Colors"
+      },
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "Primary Color",
+        "default": "#007c89"
+      },
+      {
+        "type": "color",
+        "id": "color_secondary",
+        "label": "Secondary Color",
+        "default": "#28a745"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "Accent Color",
+        "default": "#ff6b35"
+      }
+    ]
+  }
+]

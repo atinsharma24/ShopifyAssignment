@@ -1,0 +1,15 @@
+# Shopify ignore patterns
+node_modules/
+src/
+tests/
+.git/
+.github/
+*.md
+package*.json
+babel.config.js
+jest.config.js
+playwright.config.js
+.eslintrc.js
+.stylelintrc.js
+.gitignore
+.vscode/

@@ -1,0 +1,12 @@
+# Shopify Theme Configuration
+# This file is used by Shopify CLI for theme development
+
+[environments.development]
+store = "fireblaster24.myshopify.com"
+password = "31102001"
+theme_id = "144434593931"  # Your development theme ID
+
+[environments.production]
+store = "fireblaster24.myshopify.com"
+password = "31102001"
+theme_id = "144434593931"

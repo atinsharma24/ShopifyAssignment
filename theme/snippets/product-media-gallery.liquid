@@ -1,0 +1,425 @@
+{% comment %}
+  Product Media Gallery Snippet
+  Renders product images and media with interactive gallery
+  
+  Parameters:
+  - product: product object
+{% endcomment %}
+
+<div class="product-media-gallery" data-media-gallery>
+  
+  {% if product.media.size > 0 %}
+    
+    <!-- Main Media Display -->
+    <div class="media-main">
+      <div class="media-container" data-main-media>
+        {% assign featured_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media %}
+        
+        {% if featured_media %}
+          {% case featured_media.media_type %}
+            {% when 'image' %}
+              <img 
+                src="{{ featured_media | img_url: '800x800' }}" 
+                alt="{{ featured_media.alt | escape }}"
+                class="media-image main-image"
+                data-media-id="{{ featured_media.id }}"
+                loading="lazy"
+                width="800"
+                height="800"
+              >
+            {% when 'video' %}
+              <video 
+                class="media-video main-video"
+                data-media-id="{{ featured_media.id }}"
+                controls
+                poster="{{ featured_media.preview_image | img_url: '800x800' }}"
+                width="800"
+                height="800"
+              >
+                {% for source in featured_media.sources %}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {% endfor %}
+                Your browser does not support the video tag.
+              </video>
+            {% when 'external_video' %}
+              <div class="media-external-video" data-media-id="{{ featured_media.id }}">
+                {{ featured_media | external_video_tag: class: 'external-video' }}
+              </div>
+            {% when 'model' %}
+              <div class="media-model" data-media-id="{{ featured_media.id }}">
+                {{ featured_media | model_viewer_tag }}
+              </div>
+          {% endcase %}
+        {% else %}
+          <!-- Placeholder for products without media -->
+          <div class="media-placeholder">
+            <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="100" height="100" fill="#f5f5f5"/>
+              <path d="M30 40h40v20H30z" fill="#e0e0e0"/>
+              <circle cx="35" cy="45" r="2" fill="#ccc"/>
+              <path d="M65 55l-5-5-10 10-5-5-10 10h30z" fill="#ccc"/>
+            </svg>
+            <p>No image available</p>
+          </div>
+        {% endif %}
+      </div>
+      
+      <!-- Media Navigation Controls -->
+      {% if product.media.size > 1 %}
+        <button 
+          type="button" 
+          class="media-nav media-nav-prev" 
+          data-media-nav="prev"
+          aria-label="Previous image"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/>
+          </svg>
+        </button>
+        
+        <button 
+          type="button" 
+          class="media-nav media-nav-next" 
+          data-media-nav="next"
+          aria-label="Next image"
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/>
+          </svg>
+        </button>
+      {% endif %}
+    </div>
+
+    <!-- Thumbnail Navigation -->
+    {% if product.media.size > 1 %}
+      <div class="media-thumbnails" data-media-thumbnails>
+        <div class="thumbnails-container">
+          {% for media in product.media limit: 8 %}
+            <button 
+              type="button"
+              class="media-thumbnail{% if media.id == featured_media.id %} active{% endif %}"
+              data-media-id="{{ media.id }}"
+              data-media-position="{{ forloop.index0 }}"
+              aria-label="View {{ media.media_type }} {{ forloop.index }}"
+            >
+              {% case media.media_type %}
+                {% when 'image' %}
+                  <img 
+                    src="{{ media | img_url: '100x100' }}" 
+                    alt="{{ media.alt | escape }}"
+                    width="60"
+                    height="60"
+                    loading="lazy"
+                  >
+                {% when 'video' %}
+                  <div class="thumbnail-wrapper">
+                    <img 
+                      src="{{ media.preview_image | img_url: '100x100' }}" 
+                      alt="{{ media.alt | escape }}"
+                      width="60"
+                      height="60"
+                      loading="lazy"
+                    >
+                    <div class="play-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  </div>
+                {% when 'external_video' %}
+                  <div class="thumbnail-wrapper">
+                    <img 
+                      src="{{ media.preview_image | img_url: '100x100' }}" 
+                      alt="{{ media.alt | escape }}"
+                      width="60"
+                      height="60"
+                      loading="lazy"
+                    >
+                    <div class="play-icon external">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
+                  </div>
+                {% when 'model' %}
+                  <div class="thumbnail-wrapper">
+                    <img 
+                      src="{{ media.preview_image | img_url: '100x100' }}" 
+                      alt="{{ media.alt | escape }}"
+                      width="60"
+                      height="60"
+                      loading="lazy"
+                    >
+                    <div class="model-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    </div>
+                  </div>
+              {% endcase %}
+            </button>
+          {% endfor %}
+          
+          {% comment %} Show "more" indicator if there are more than 8 media items {% endcomment %}
+          {% if product.media.size > 8 %}
+            <div class="media-more">
+              <span>+{{ product.media.size | minus: 8 }}</span>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+  {% else %}
+    
+    <!-- No Media Available -->
+    <div class="product-media-gallery no-media">
+      <div class="media-placeholder">
+        <svg width="150" height="150" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="150" height="150" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+          <rect x="45" y="60" width="60" height="30" fill="#dee2e6"/>
+          <circle cx="52.5" cy="67.5" r="3" fill="#adb5bd"/>
+          <path d="M97.5 82.5l-7.5-7.5-15 15-7.5-7.5-15 15h45z" fill="#adb5bd"/>
+        </svg>
+        <p class="no-media-text">No product images available</p>
+      </div>
+    </div>
+
+  {% endif %}
+  
+</div>
+
+<style>
+.product-media-gallery {
+  position: relative;
+  max-width: 100%;
+}
+
+.media-main {
+  position: relative;
+  margin-bottom: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.media-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-image,
+.media-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.media-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+  text-align: center;
+}
+
+.media-placeholder p,
+.no-media-text {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.media-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.media-main:hover .media-nav {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.media-nav:hover {
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.media-nav-prev {
+  left: 1rem;
+}
+
+.media-nav-next {
+  right: 1rem;
+}
+
+.media-thumbnails {
+  margin-top: 1rem;
+}
+
+.thumbnails-container {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0;
+  scroll-behavior: smooth;
+}
+
+.media-thumbnail {
+  flex: 0 0 60px;
+  height: 60px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.media-thumbnail:hover {
+  border-color: #007c89;
+}
+
+.media-thumbnail.active {
+  border-color: #007c89;
+  box-shadow: 0 2px 8px rgba(0, 124, 137, 0.3);
+}
+
+.media-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbnail-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.play-icon,
+.model-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-icon.external {
+  background: rgba(220, 53, 69, 0.8);
+}
+
+.media-more {
+  flex: 0 0 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6c757d;
+}
+
+/* External video and model viewer styling */
+.media-external-video,
+.media-model {
+  width: 100%;
+  height: 100%;
+}
+
+.external-video,
+model-viewer {
+  width: 100%;
+  height: 100%;
+}
+
+/* No media state */
+.product-media-gallery.no-media {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .media-nav {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .media-nav-prev {
+    left: 0.5rem;
+  }
+  
+  .media-nav-next {
+    right: 0.5rem;
+  }
+  
+  .media-thumbnail {
+    flex: 0 0 50px;
+    height: 50px;
+  }
+  
+  .thumbnails-container {
+    gap: 0.25rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .media-nav,
+  .media-thumbnail {
+    transition: none;
+  }
+  
+  .thumbnails-container {
+    scroll-behavior: auto;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .media-nav {
+    background: white;
+    border: 2px solid black;
+  }
+  
+  .media-thumbnail {
+    border-width: 3px;
+  }
+}
+</style>

@@ -1,0 +1,58 @@
+{
+  "name": "shopify-assignment-theme",
+  "version": "1.0.0",
+  "description": "Complete Shopify theme with subscription logic, dynamic variants, and automated testing",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm:watch:scss\" \"shopify theme dev\"",
+    "watch:scss": "sass --watch theme/assets/product.scss:theme/assets/product.css",
+    "build": "npm run typecheck && npm run build:scss && npm run build:js",
+    "build:scss": "sass theme/assets/product.scss:theme/assets/product.css --style=compressed",
+    "build:js": "babel src --extensions \".ts\" --out-dir theme/assets --ignore \"**/*.d.ts\"",
+    "lint": "npm run lint:js && npm run lint:css",
+    "lint:js": "eslint . --ext .ts,.js",
+    "lint:css": "stylelint \"theme/assets/**/*.scss\"",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "jest",
+    "test:e2e": "playwright test",
+    "test:watch": "jest --watch",
+    "theme:check": "shopify theme check",
+    "theme:deploy": "shopify theme push --allow-live",
+    "theme:deploy:ci": "shopify theme push --password=$SHOPIFY_PASSWORD --store=$SHOPIFY_STORE --allow-live",
+    "setup": "npm ci && shopify login",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "shopify",
+    "theme",
+    "subscription",
+    "ecommerce"
+  ],
+  "author": "Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.22.0",
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "@babel/preset-typescript": "^7.22.0",
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.40.0",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.7",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.50.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "prettier": "^3.0.0",
+    "sass": "^1.69.0",
+    "stylelint": "^15.11.0",
+    "stylelint-config-standard-scss": "^11.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

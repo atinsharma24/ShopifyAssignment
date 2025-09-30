@@ -1,0 +1,205 @@
+<!-- Main Product Template -->
+<!-- This template renders the complete product page with subscription logic -->
+{% comment %}
+  This template includes:
+  - Product JSON data injection for JavaScript
+  - Media gallery for product images
+  - Purchase mode selection (single/double)
+  - Flavor selection interface
+  - Dynamic pricing display
+  - What's Included content from metafields
+  - Add to cart functionality
+{% endcomment %}
+
+<div class="product-page" data-product='{{ product | json | escape }}'>
+  <div class="product-container">
+    
+    <!-- Product Media Gallery -->
+    <div class="product-media">
+      {% render 'product-media-gallery', product: product %}
+    </div>
+
+    <!-- Product Information -->
+    <div class="product-info">
+      <h1 class="product-title">{{ product.title }}</h1>
+      
+      <!-- Product Form -->
+      <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-form">
+        
+        <!-- Purchase Mode Selection -->
+        <div class="purchase-mode-section">
+          <h3 class="section-title">Choose Your Plan</h3>
+          <div class="radio-group" role="radiogroup" aria-labelledby="purchase-mode-title">
+            <div class="radio-option">
+              <input 
+                type="radio" 
+                id="mode-single" 
+                name="purchase_mode" 
+                value="single" 
+                checked 
+                aria-describedby="mode-single-desc"
+              >
+              <label for="mode-single" class="radio-label">
+                <span class="radio-title">Single Drink Subscription</span>
+                <span class="radio-description" id="mode-single-desc">Perfect for individual enjoyment</span>
+              </label>
+            </div>
+            
+            <div class="radio-option">
+              <input 
+                type="radio" 
+                id="mode-double" 
+                name="purchase_mode" 
+                value="double"
+                aria-describedby="mode-double-desc"
+              >
+              <label for="mode-double" class="radio-label">
+                <span class="radio-title">Double Drink Subscription</span>
+                <span class="radio-description" id="mode-double-desc">Great for couples or extra servings</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flavor Selection -->
+        <div class="flavor-selection-section">
+          <h3 class="section-title">Select Your Flavor(s)</h3>
+          
+          <!-- Single Mode Flavor Selector -->
+          <div class="flavor-selector single-flavor" data-mode="single">
+            <h4 class="flavor-title">Choose Your Flavor</h4>
+            {% render 'flavor-swatches', 
+              flavors: 'Chocolate,Vanilla,Orange', 
+              selector_id: 'flavor-single',
+              default: 'Chocolate'
+            %}
+          </div>
+
+          <!-- Double Mode Flavor Selectors -->
+          <div class="flavor-selector double-flavor" data-mode="double" style="display: none;">
+            <div class="flavor-group">
+              <h4 class="flavor-title">Flavor 1</h4>
+              {% render 'flavor-swatches', 
+                flavors: 'Chocolate,Vanilla,Orange', 
+                selector_id: 'flavor-1',
+                default: 'Chocolate'
+              %}
+            </div>
+            
+            <div class="flavor-group">
+              <h4 class="flavor-title">Flavor 2</h4>
+              {% render 'flavor-swatches', 
+                flavors: 'Chocolate,Vanilla,Orange', 
+                selector_id: 'flavor-2',
+                default: 'Vanilla'
+              %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Display -->
+        <div class="price-section">
+          {% render 'price-display' %}
+        </div>
+
+        <!-- What's Included Section -->
+        <div class="whats-included-section">
+          <h3 class="section-title">What's Included</h3>
+          <div class="included-content">
+            <!-- Content will be populated by JavaScript from metafields -->
+            <div class="included-single" data-mode="single">
+              {% if product.metafields.subscription.single %}
+                {{ product.metafields.subscription.single | metafield_tag }}
+              {% else %}
+                <div class="default-content">
+                  <p><strong>Delivery:</strong> Monthly delivery</p>
+                  <ul>
+                    <li>1 premium drink mix per month</li>
+                    <li>Recipe cards and tips</li>
+                    <li>Free shipping</li>
+                  </ul>
+                </div>
+              {% endif %}
+            </div>
+            
+            <div class="included-double" data-mode="double" style="display: none;">
+              {% if product.metafields.subscription.double %}
+                {{ product.metafields.subscription.double | metafield_tag }}
+              {% else %}
+                <div class="default-content">
+                  <p><strong>Delivery:</strong> Monthly delivery</p>
+                  <ul>
+                    <li>2 premium drink mixes per month</li>
+                    <li>Recipe cards and tips</li>
+                    <li>Free shipping</li>
+                    <li>10% bulk discount</li>
+                  </ul>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden Fields for Variant Selection -->
+        <input type="hidden" name="id" id="variant-id" value="">
+        <input type="hidden" name="quantity" value="1">
+
+        <!-- Add to Cart Button -->
+        <div class="add-to-cart-section">
+          <button 
+            type="submit" 
+            class="btn btn-primary add-to-cart-btn"
+            data-add-to-cart
+            aria-describedby="cart-errors"
+          >
+            <span class="btn-text">Add to Cart</span>
+            <span class="btn-loading" style="display: none;">Adding...</span>
+          </button>
+          
+          <div id="cart-errors" class="error-message" role="alert" aria-live="polite"></div>
+          <div id="cart-success" class="success-message" role="status" aria-live="polite"></div>
+        </div>
+
+      </form>
+
+      <!-- Product Description -->
+      {% if product.description %}
+        <div class="product-description">
+          <h3>About This Product</h3>
+          {{ product.description }}
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+
+<!-- JavaScript Initialization -->
+<script type="module">
+  // Initialize product page functionality
+  import { ProductManager } from '{{ 'product.js' | asset_url }}';
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    const productData = {{ product | json }};
+    const productManager = new ProductManager(productData);
+    productManager.init();
+  });
+</script>
+
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": {{ product.title | json }},
+  "description": {{ product.description | strip_html | json }},
+  "sku": {{ product.selected_or_first_available_variant.sku | json }},
+  "offers": {
+    "@type": "Offer",
+    "price": {{ product.selected_or_first_available_variant.price | divided_by: 100.0 | json }},
+    "priceCurrency": {{ cart.currency.iso_code | json }},
+    "availability": "https://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}"
+  }
+}
+</script>

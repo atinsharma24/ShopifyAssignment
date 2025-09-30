@@ -1,0 +1,266 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Lint and validate code quality
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run ESLint
+      run: npm run lint:js
+
+    - name: Run Stylelint
+      run: npm run lint:css
+
+    - name: Build assets
+      run: npm run build
+
+  # Run unit tests
+  test-unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run unit tests
+      run: npm run test:unit
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: success()
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+
+  # Run Shopify Theme Check
+  theme-check:
+    name: Shopify Theme Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.0'
+
+    - name: Install Shopify CLI
+      run: |
+        gem install shopify-cli
+        gem install theme-check
+
+    - name: Run Theme Check
+      run: theme-check theme/
+
+  # Run end-to-end tests (only if secrets are available)
+  test-e2e:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    if: ${{ secrets.SHOPIFY_STORE && secrets.SHOPIFY_PASSWORD }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+
+    - name: Setup Shopify CLI
+      run: |
+        npm install -g @shopify/cli @shopify/theme
+
+    - name: Start Shopify theme dev server
+      run: |
+        shopify theme dev --port=9292 --host=0.0.0.0 &
+        sleep 30 # Wait for server to start
+      env:
+        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
+
+    - name: Run Playwright tests
+      run: npm run test:e2e
+      env:
+        E2E_HOST: http://localhost:9292
+
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  # Deploy to development store (main branch only)
+  deploy-dev:
+    name: Deploy to Dev Store
+    runs-on: ubuntu-latest
+    needs: [lint, test-unit, theme-check]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.SHOPIFY_STORE
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build production assets
+      run: npm run build
+
+    - name: Setup Shopify CLI
+      run: |
+        npm install -g @shopify/cli @shopify/theme
+
+    - name: Deploy theme
+      run: |
+        shopify theme push --allow-live --password=${{ secrets.SHOPIFY_PASSWORD }} --store=${{ secrets.SHOPIFY_STORE }}
+      env:
+        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
+
+    - name: Comment on PR with deployment info
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '🚀 Theme deployed to dev store: https://${{ secrets.SHOPIFY_STORE }}'
+          })
+
+  # Security audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Run npm audit
+      run: npm audit --audit-level=moderate
+
+    - name: Run npm audit fix
+      run: npm audit fix --dry-run
+
+  # Performance and accessibility checks
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    if: ${{ secrets.SHOPIFY_STORE && secrets.SHOPIFY_PASSWORD }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Setup Shopify CLI
+      run: |
+        npm install -g @shopify/cli @shopify/theme
+
+    - name: Start Shopify theme dev server
+      run: |
+        shopify theme dev --port=9292 --host=0.0.0.0 &
+        sleep 30
+      env:
+        SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+        SHOPIFY_PASSWORD: ${{ secrets.SHOPIFY_PASSWORD }}
+
+    - name: Run Lighthouse CI
+      run: |
+        npm install -g @lhci/cli@0.12.x
+        lhci autorun
+      env:
+        LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  # Notification on workflow completion
+  notify:
+    name: Notifications
+    runs-on: ubuntu-latest
+    needs: [lint, test-unit, theme-check, deploy-dev]
+    if: always()
+    
+    steps:
+    - name: Notify success
+      if: ${{ needs.lint.result == 'success' && needs.test-unit.result == 'success' && needs.theme-check.result == 'success' }}
+      run: |
+        echo "✅ All checks passed successfully!"
+        echo "- Code quality: ✅"
+        echo "- Unit tests: ✅"
+        echo "- Theme check: ✅"
+        echo "- Deployment: ${{ needs.deploy-dev.result == 'success' && '✅' || '⏭️ Skipped' }}"
+
+    - name: Notify failure
+      if: ${{ needs.lint.result == 'failure' || needs.test-unit.result == 'failure' || needs.theme-check.result == 'failure' }}
+      run: |
+        echo "❌ Some checks failed:"
+        echo "- Code quality: ${{ needs.lint.result == 'success' && '✅' || '❌' }}"
+        echo "- Unit tests: ${{ needs.test-unit.result == 'success' && '✅' || '❌' }}"
+        echo "- Theme check: ${{ needs.theme-check.result == 'success' && '✅' || '❌' }}"
+        exit 1

@@ -1,0 +1,259 @@
+{% comment %}
+  Flavor Swatches Snippet
+  Renders clickable flavor selection swatches with images
+  
+  Parameters:
+  - flavors: comma-separated list of flavor names
+  - selector_id: unique ID for this selector group
+  - default: default selected flavor
+{% endcomment %}
+
+{% assign flavor_list = flavors | split: ',' %}
+
+<div class="flavor-swatches" data-flavor-selector="{{ selector_id }}">
+  
+  {% for flavor in flavor_list %}
+    {% assign flavor_clean = flavor | strip %}
+    {% assign is_default = false %}
+    {% if default and flavor_clean == default %}
+      {% assign is_default = true %}
+    {% endif %}
+    
+    <div class="flavor-swatch{% if is_default %} selected{% endif %}">
+      <input 
+        type="radio" 
+        id="{{ selector_id }}-{{ flavor_clean | downcase }}" 
+        name="{{ selector_id }}" 
+        value="{{ flavor_clean }}"
+        {% if is_default %}checked{% endif %}
+        class="flavor-input sr-only"
+      >
+      
+      <label 
+        for="{{ selector_id }}-{{ flavor_clean | downcase }}" 
+        class="flavor-label"
+        aria-describedby="{{ selector_id }}-{{ flavor_clean | downcase }}-desc"
+      >
+        <!-- Flavor Image -->
+        <div class="flavor-image">
+          {% comment %}
+            In a real implementation, you would have actual flavor images.
+            For this demo, we'll use placeholder images or CSS-generated visuals.
+          {% endcomment %}
+          {% case flavor_clean %}
+            {% when 'Chocolate' %}
+              <div class="flavor-visual chocolate-visual" aria-hidden="true">🍫</div>
+            {% when 'Vanilla' %}
+              <div class="flavor-visual vanilla-visual" aria-hidden="true">🥛</div>
+            {% when 'Orange' %}
+              <div class="flavor-visual orange-visual" aria-hidden="true">🍊</div>
+            {% else %}
+              <div class="flavor-visual default-visual" aria-hidden="true">🥤</div>
+          {% endcase %}
+        </div>
+        
+        <!-- Flavor Name -->
+        <span class="flavor-name">{{ flavor_clean }}</span>
+        
+        <!-- Selection Indicator -->
+        <span class="selection-indicator" aria-hidden="true">✓</span>
+      </label>
+      
+      <!-- Hidden description for screen readers -->
+      <span id="{{ selector_id }}-{{ flavor_clean | downcase }}-desc" class="sr-only">
+        {{ flavor_clean }} flavor option
+      </span>
+    </div>
+    
+  {% endfor %}
+  
+</div>
+
+<style>
+.flavor-swatches {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.flavor-swatch {
+  position: relative;
+  flex: 1;
+  min-width: 100px;
+  max-width: 150px;
+}
+
+.flavor-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.flavor-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-height: 120px;
+  justify-content: center;
+}
+
+.flavor-label:hover {
+  border-color: #007c89;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 124, 137, 0.15);
+}
+
+.flavor-swatch.selected .flavor-label {
+  border-color: #007c89;
+  background-color: #f0feff;
+  box-shadow: 0 2px 8px rgba(0, 124, 137, 0.2);
+}
+
+.flavor-image {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #f5f5f5;
+}
+
+.flavor-visual {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.chocolate-visual {
+  background: linear-gradient(135deg, #8B4513, #D2691E);
+}
+
+.vanilla-visual {
+  background: linear-gradient(135deg, #FFF8DC, #F5DEB3);
+}
+
+.orange-visual {
+  background: linear-gradient(135deg, #FF8C00, #FFA500);
+}
+
+.default-visual {
+  background: linear-gradient(135deg, #E0E0E0, #CCCCCC);
+}
+
+.flavor-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.selection-indicator {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 20px;
+  height: 20px;
+  background: #007c89;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+}
+
+.flavor-swatch.selected .selection-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Screen reader only class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flavor-swatches {
+    gap: 0.5rem;
+  }
+  
+  .flavor-swatch {
+    min-width: 80px;
+  }
+  
+  .flavor-label {
+    padding: 0.75rem;
+    min-height: 100px;
+  }
+  
+  .flavor-image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .flavor-visual {
+    font-size: 1.5rem;
+  }
+  
+  .flavor-name {
+    font-size: 0.75rem;
+  }
+}
+
+/* Focus styles for accessibility */
+.flavor-input:focus + .flavor-label {
+  outline: 2px solid #007c89;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .flavor-label {
+    border-width: 3px;
+  }
+  
+  .flavor-swatch.selected .flavor-label {
+    background-color: #000;
+    color: #fff;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .flavor-label,
+  .selection-indicator {
+    transition: none;
+  }
+  
+  .flavor-label:hover {
+    transform: none;
+  }
+}
+</style>

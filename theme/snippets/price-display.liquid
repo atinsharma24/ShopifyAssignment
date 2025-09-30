@@ -1,0 +1,206 @@
+{% comment %}
+  Price Display Snippet
+  Displays original price, subscription price, and final discounted prices
+  Prices are calculated and updated by JavaScript
+{% endcomment %}
+
+<div class="price-display" data-price-display>
+  
+  <!-- Main Price (One-time Purchase) -->
+  <div class="price-option main-price" data-price-type="main">
+    <div class="price-header">
+      <h4 class="price-title">One-Time Purchase</h4>
+    </div>
+    <div class="price-amount">
+      <span class="current-price" data-main-price>
+        {{ product.selected_or_first_available_variant.price | money }}
+      </span>
+      <span class="original-price" data-main-original style="display: none;">
+        {{ product.selected_or_first_available_variant.compare_at_price | money }}
+      </span>
+    </div>
+    <div class="price-savings" data-main-savings style="display: none;">
+      Save <span class="savings-amount"></span>
+    </div>
+  </div>
+
+  <!-- Subscription Price -->
+  <div class="price-option subscription-price selected" data-price-type="subscription">
+    <div class="price-header">
+      <h4 class="price-title">
+        Subscription 
+        <span class="badge subscription-badge">25% OFF</span>
+      </h4>
+      <p class="price-description">Plus 20% site-wide discount</p>
+    </div>
+    <div class="price-amount">
+      <span class="current-price" data-subscription-price>
+        {{ product.selected_or_first_available_variant.price | times: 0.6 | money }}
+      </span>
+      <span class="original-price" data-subscription-original>
+        {{ product.selected_or_first_available_variant.price | money }}
+      </span>
+    </div>
+    <div class="price-savings" data-subscription-savings>
+      Save <span class="savings-amount">
+        {{ product.selected_or_first_available_variant.price | times: 0.4 | money }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Price per serving (for double mode) -->
+  <div class="price-per-serving" data-price-per-serving style="display: none;">
+    <small class="per-serving-text">
+      <span data-per-serving-price></span> per serving
+    </small>
+  </div>
+
+  <!-- Delivery Info -->
+  <div class="delivery-info">
+    <div class="delivery-item">
+      <span class="delivery-icon">📦</span>
+      <span class="delivery-text">Free shipping on all orders</span>
+    </div>
+    <div class="delivery-item">
+      <span class="delivery-icon">🔄</span>
+      <span class="delivery-text">Cancel or pause anytime</span>
+    </div>
+  </div>
+
+  <!-- Price Breakdown (for transparency) -->
+  <details class="price-breakdown">
+    <summary>Price Breakdown</summary>
+    <div class="breakdown-content">
+      <div class="breakdown-row">
+        <span>Base Price:</span>
+        <span data-breakdown-base>{{ product.selected_or_first_available_variant.price | money }}</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Subscription Discount (25%):</span>
+        <span data-breakdown-subscription class="discount">-{{ product.selected_or_first_available_variant.price | times: 0.25 | money }}</span>
+      </div>
+      <div class="breakdown-row">
+        <span>Site-wide Discount (20%):</span>
+        <span data-breakdown-sitewide class="discount">-{{ product.selected_or_first_available_variant.price | times: 0.2 | money }}</span>
+      </div>
+      <div class="breakdown-row total">
+        <span>Final Price:</span>
+        <span data-breakdown-final>{{ product.selected_or_first_available_variant.price | times: 0.6 | money }}</span>
+      </div>
+    </div>
+  </details>
+
+</div>
+
+<style>
+.price-display {
+  margin: 1.5rem 0;
+}
+
+.price-option {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.price-option.selected {
+  border-color: #007c89;
+  background-color: #f0feff;
+}
+
+.price-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.price-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.subscription-badge {
+  background: #007c89;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.price-description {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.price-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.current-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007c89;
+}
+
+.original-price {
+  font-size: 1rem;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.price-savings {
+  color: #d73527;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.delivery-info {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.delivery-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.price-breakdown {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.breakdown-content {
+  padding-top: 0.5rem;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+}
+
+.breakdown-row.total {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+  font-weight: bold;
+}
+
+.discount {
+  color: #d73527;
+}
+</style>

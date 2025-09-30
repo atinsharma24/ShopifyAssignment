@@ -1,0 +1,510 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#007c89">
+  
+  <!-- SEO Meta Tags -->
+  <title>{{ page_title }}{% if current_tags %} &ndash; {{ 'general.meta.tags' | t: tags: current_tags.first }}{% endif %}{% if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}</title>
+  
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+  
+  <link rel="canonical" href="{{ canonical_url }}">
+  
+  <!-- Preconnect to required origins -->
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Favicon -->
+  {% if settings.favicon != blank %}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | img_url: '32x32' }}">
+  {% endif %}
+  
+  <!-- Social Media Meta Tags -->
+  {% render 'meta-tags' %}
+  
+  <!-- Font Loading -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"></noscript>
+  
+  <!-- Critical CSS -->
+  <style>
+    :root {
+      --font-body-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-body-style: normal;
+      --font-body-weight: 400;
+      --font-body-weight-bold: 700;
+      
+      --color-primary: #007c89;
+      --color-primary-dark: #005a63;
+      --color-secondary: #28a745;
+      --color-accent: #ff6b35;
+      --color-text: #333333;
+      --color-text-light: #666666;
+      --color-background: #ffffff;
+      --color-background-alt: #f8f9fa;
+      --color-border: #e0e0e0;
+      --color-error: #dc3545;
+      --color-success: #28a745;
+      
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-xxl: 3rem;
+      
+      --border-radius: 8px;
+      --border-radius-lg: 12px;
+      
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+      
+      --transition-fast: 0.15s ease;
+      --transition-base: 0.3s ease;
+      --transition-slow: 0.5s ease;
+    }
+    
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    
+    html {
+      box-sizing: border-box;
+      font-size: 62.5%;
+      height: 100%;
+    }
+    
+    body {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      grid-template-areas: 
+        "header"
+        "main" 
+        "footer";
+      min-height: 100%;
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: 0.6px;
+      line-height: 1.6;
+      font-family: var(--font-body-family);
+      font-style: var(--font-body-style);
+      font-weight: var(--font-body-weight);
+      color: var(--color-text);
+      background-color: var(--color-background);
+    }
+    
+    .no-js {
+      overflow-x: hidden;
+    }
+    
+    .js {
+      overflow-x: auto;
+    }
+    
+    /* Skip to content link for accessibility */
+    .skip-to-content-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      z-index: 9999;
+      color: var(--color-background);
+      background-color: var(--color-primary);
+      padding: 8px;
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      transition: top var(--transition-fast);
+    }
+    
+    .skip-to-content-link:focus {
+      top: 6px;
+    }
+    
+    /* Loading state */
+    .loading {
+      position: relative;
+      pointer-events: none;
+    }
+    
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 20px;
+      height: 20px;
+      margin: -10px 0 0 -10px;
+      border: 2px solid transparent;
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+  
+  <!-- Theme CSS -->
+  {{ 'product.css' | asset_url | stylesheet_tag: preload: true }}
+  
+  <!-- JavaScript -->
+  <script>
+    document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+    
+    // Global theme object for JavaScript modules
+    window.theme = window.theme || {};
+    window.theme.routes = {
+      cart_add_url: '{{ routes.cart_add_url }}',
+      cart_change_url: '{{ routes.cart_change_url }}',
+      cart_update_url: '{{ routes.cart_update_url }}',
+      cart_url: '{{ routes.cart_url }}',
+      predictive_search_url: '{{ routes.predictive_search_url }}'
+    };
+    
+    window.theme.strings = {
+      addToCart: {{ 'products.product.add_to_cart' | t | json }},
+      soldOut: {{ 'products.product.sold_out' | t | json }},
+      unavailable: {{ 'products.product.unavailable' | t | json }},
+      unitPrice: {{ 'products.product.price.unit_price' | t | json }}
+    };
+    
+    window.theme.moneyFormat = {{ shop.money_format | json }};
+    window.theme.cartType = {{ settings.cart_type | json }};
+    
+    // Performance monitoring
+    window.theme.performance = {
+      mark: function(name) {
+        if (window.performance && window.performance.mark) {
+          window.performance.mark(name);
+        }
+      },
+      measure: function(name, startMark, endMark) {
+        if (window.performance && window.performance.measure) {
+          window.performance.measure(name, startMark, endMark);
+        }
+      }
+    };
+    
+    window.theme.performance.mark('theme_js_start');
+  </script>
+  
+  <!-- Shopify analytics -->
+  {{ content_for_header }}
+</head>
+
+<body class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if customer %} customer-logged-in{% endif %}{% if settings.cart_type == 'drawer' %} cart-drawer{% endif %}">
+  
+  <!-- Skip to content for accessibility -->
+  <a class="skip-to-content-link visually-hidden" href="#MainContent">
+    {{ 'accessibility.skip_to_text' | t }}
+  </a>
+
+  {% comment %}
+    Global Loading Indicator
+    Shows during AJAX operations
+  {% endcomment %}
+  <div id="global-loading" class="global-loading" style="display: none;" aria-hidden="true">
+    <div class="loading-spinner"></div>
+  </div>
+
+  {% comment %}
+    Header Section
+    Contains navigation, logo, cart, etc.
+  {% endcomment %}
+  <header class="header" role="banner" style="grid-area: header;">
+    <div class="header-wrapper">
+      <!-- Simple header for the assignment - normally would be more complex -->
+      <div class="header-content">
+        <div class="header-logo">
+          {% if shop.logo %}
+            <img src="{{ shop.logo | img_url: '200x' }}" alt="{{ shop.name }}" width="auto" height="50">
+          {% else %}
+            <h1 class="header-title">{{ shop.name }}</h1>
+          {% endif %}
+        </div>
+        
+        <nav class="header-nav" role="navigation" aria-label="Main navigation">
+          <ul class="nav-list">
+            <li><a href="{{ routes.root_url }}">Home</a></li>
+            <li><a href="{{ routes.all_products_collection_url }}">Products</a></li>
+            <li><a href="{{ routes.cart_url }}" id="cart-link">Cart (<span id="cart-count">{{ cart.item_count }}</span>)</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  {% comment %}
+    Main Content Area
+    This is where the page templates render
+  {% endcomment %}
+  <main id="MainContent" class="main-content" role="main" tabindex="-1" style="grid-area: main;">
+    {{ content_for_layout }}
+  </main>
+
+  {% comment %}
+    Footer Section
+  {% endcomment %}
+  <footer class="footer" role="contentinfo" style="grid-area: footer;">
+    <div class="footer-wrapper">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>{{ shop.name }}</h3>
+          <p>Premium drink subscriptions delivered monthly.</p>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{{ routes.root_url }}">Home</a></li>
+            <li><a href="{{ routes.all_products_collection_url }}">Products</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer-section">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#shipping">Shipping</a></li>
+            <li><a href="#returns">Returns</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  {% comment %}
+    Cart Drawer (if enabled)
+  {% endcomment %}
+  {% if settings.cart_type == 'drawer' %}
+    {% render 'cart-drawer' %}
+  {% endif %}
+
+  {% comment %}
+    JavaScript Assets
+    Loaded at the end for better performance
+  {% endcomment %}
+  <script>
+    window.theme.performance.mark('theme_js_end');
+    window.theme.performance.measure('theme_js_duration', 'theme_js_start', 'theme_js_end');
+  </script>
+  
+  <!-- Main theme JavaScript -->
+  <script src="{{ 'product.js' | asset_url }}" defer></script>
+  
+  <!-- Shopify analytics -->
+  {% if shop.enabled_currencies.size > 1 %}
+    <script src="{{ 'currency.js' | asset_url }}" defer></script>
+  {% endif %}
+
+  <style>
+    /* Header Styles */
+    .header {
+      background: var(--color-background);
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    
+    .header-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-md);
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 60px;
+    }
+    
+    .header-title {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    
+    .nav-list {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: var(--spacing-lg);
+    }
+    
+    .nav-list a {
+      text-decoration: none;
+      color: var(--color-text);
+      font-weight: 500;
+      transition: color var(--transition-base);
+    }
+    
+    .nav-list a:hover {
+      color: var(--color-primary);
+    }
+    
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--spacing-xl) var(--spacing-md);
+      min-height: 60vh;
+    }
+    
+    /* Footer Styles */
+    .footer {
+      background: var(--color-background-alt);
+      border-top: 1px solid var(--color-border);
+      margin-top: auto;
+    }
+    
+    .footer-wrapper {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--spacing-xxl) var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+    }
+    
+    .footer-section h3,
+    .footer-section h4 {
+      margin: 0 0 var(--spacing-md) 0;
+      color: var(--color-primary);
+    }
+    
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .footer-section ul li {
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .footer-section a {
+      color: var(--color-text-light);
+      text-decoration: none;
+      transition: color var(--transition-base);
+    }
+    
+    .footer-section a:hover {
+      color: var(--color-primary);
+    }
+    
+    .footer-bottom {
+      padding-top: var(--spacing-lg);
+      border-top: 1px solid var(--color-border);
+      text-align: center;
+      color: var(--color-text-light);
+      font-size: 1.4rem;
+    }
+    
+    /* Global Loading Indicator */
+    .global-loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--color-primary);
+      z-index: 9999;
+      animation: loading-bar 2s ease-in-out infinite;
+    }
+    
+    @keyframes loading-bar {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(0%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm) 0;
+      }
+      
+      .nav-list {
+        gap: var(--spacing-md);
+      }
+      
+      .main-content {
+        padding: var(--spacing-lg) var(--spacing-sm);
+      }
+      
+      .footer-content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+      }
+    }
+    
+    /* Accessibility */
+    .visually-hidden {
+      position: absolute !important;
+      overflow: hidden;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      clip: rect(0 0 0 0);
+      word-wrap: normal !important;
+    }
+    
+    /* Focus styles */
+    a:focus,
+    button:focus,
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 2px;
+    }
+    
+    /* High contrast mode support */
+    @media (prefers-contrast: high) {
+      :root {
+        --color-text: #000000;
+        --color-background: #ffffff;
+        --color-border: #000000;
+      }
+    }
+    
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</body>
+</html>

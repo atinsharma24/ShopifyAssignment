@@ -1,0 +1,19 @@
+{
+  "current": {
+    "enable_subscription_mode": true,
+    "subscription_discount": 25,
+    "site_wide_discount": 20,
+    "color_primary": "#007c89",
+    "color_secondary": "#28a745",
+    "color_accent": "#ff6b35",
+    "sections": {
+      "header": {
+        "type": "header"
+      },
+      "footer": {
+        "type": "footer"
+      }
+    },
+    "content_for_index": []
+  }
+}

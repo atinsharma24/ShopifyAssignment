@@ -1,0 +1,85 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "--runInBand",
+        "--no-cache",
+        "--verbose"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "Debug Jest Current File",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "args": [
+        "${relativeFile}",
+        "--runInBand",
+        "--no-cache",
+        "--verbose"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "test"
+      }
+    },
+    {
+      "name": "Debug Playwright Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/playwright",
+      "args": [
+        "test",
+        "--debug"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "NODE_ENV": "test",
+        "E2E_HOST": "http://localhost:9292"
+      }
+    },
+    {
+      "name": "Launch Chrome for Debugging",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:9292",
+      "webRoot": "${workspaceFolder}/theme",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug",
+      "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+        "webpack:///./*": "${workspaceFolder}/*",
+        "webpack:///src/*": "${workspaceFolder}/src/*",
+        "webpack:///theme/*": "${workspaceFolder}/theme/*"
+      }
+    },
+    {
+      "name": "Attach to Shopify Theme Dev",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/theme",
+      "url": "http://localhost:9292",
+      "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+        "webpack:///./*": "${workspaceFolder}/*",
+        "webpack:///src/*": "${workspaceFolder}/src/*",
+        "webpack:///theme/*": "${workspaceFolder}/theme/*"
+      }
+    }
+  ]
+}

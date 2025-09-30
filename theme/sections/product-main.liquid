@@ -1,0 +1,154 @@
+{% comment %}
+  Product Main Section
+  This section can be used as an alternative to embedding product content directly in the template
+  It provides the same functionality but as a reusable section
+{% endcomment %}
+
+<section class="product-main-section">
+  <div class="container">
+    <div class="product-layout">
+      
+      <!-- Product Images -->
+      <div class="product-images">
+        {% if product.media.size > 0 %}
+          <div class="media-gallery" data-media-gallery>
+            <div class="main-media">
+              {% for media in product.media limit: 1 %}
+                {% case media.media_type %}
+                  {% when 'image' %}
+                    <img 
+                      src="{{ media | image_url: width: 600 }}"
+                      alt="{{ media.alt | escape }}"
+                      class="main-image"
+                      data-main-image
+                    >
+                  {% when 'video' %}
+                    <video controls class="main-video">
+                      <source src="{{ media.sources[0].url }}" type="{{ media.sources[0].mime_type }}">
+                    </video>
+                {% endcase %}
+              {% endfor %}
+            </div>
+            
+            {% if product.media.size > 1 %}
+              <div class="media-thumbnails">
+                {% for media in product.media %}
+                  <button 
+                    class="thumbnail{% if forloop.first %} active{% endif %}"
+                    data-media-id="{{ media.id }}"
+                    aria-label="View {{ media.alt | escape }}"
+                  >
+                    {% case media.media_type %}
+                      {% when 'image' %}
+                        <img 
+                          src="{{ media | image_url: width: 100 }}"
+                          alt="{{ media.alt | escape }}"
+                        >
+                      {% when 'video' %}
+                        <img 
+                          src="{{ media.preview_image | image_url: width: 100 }}"
+                          alt="{{ media.alt | escape }}"
+                        >
+                        <span class="play-icon">▶</span>
+                    {% endcase %}
+                  </button>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="no-media">
+            <img src="{{ 'product-placeholder.svg' | asset_url }}" alt="No image available">
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Product Details -->
+      <div class="product-details">
+        
+        <!-- Product Title -->
+        <h1 class="product-title">{{ section.settings.title | default: product.title }}</h1>
+        
+        <!-- Product Rating (if available) -->
+        {% if product.metafields.reviews.rating %}
+          <div class="product-rating">
+            <span class="stars" aria-label="Rating: {{ product.metafields.reviews.rating }} out of 5">
+              {% assign rating = product.metafields.reviews.rating | round %}
+              {% for i in (1..5) %}
+                <span class="star{% if i <= rating %} filled{% endif %}">★</span>
+              {% endfor %}
+            </span>
+            <span class="rating-text">({{ product.metafields.reviews.rating }}/5)</span>
+          </div>
+        {% endif %}
+
+        <!-- Product Form -->
+        {% render 'product-form', product: product %}
+
+        <!-- Product Benefits -->
+        {% if section.settings.show_benefits %}
+          <div class="product-benefits">
+            <h3>Why Choose Our Subscription?</h3>
+            <ul class="benefits-list">
+              <li>✓ Premium quality ingredients</li>
+              <li>✓ Free shipping on all orders</li>
+              <li>✓ Cancel or modify anytime</li>
+              <li>✓ Exclusive member discounts</li>
+            </ul>
+          </div>
+        {% endif %}
+
+        <!-- Trust Badges -->
+        {% if section.settings.show_trust_badges %}
+          <div class="trust-badges">
+            <div class="badge">
+              <span class="badge-icon">🔒</span>
+              <span class="badge-text">Secure Checkout</span>
+            </div>
+            <div class="badge">
+              <span class="badge-icon">🚚</span>
+              <span class="badge-text">Free Shipping</span>
+            </div>
+            <div class="badge">
+              <span class="badge-icon">↩️</span>
+              <span class="badge-text">Easy Returns</span>
+            </div>
+          </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product Main",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Custom Product Title",
+      "info": "Leave blank to use product title"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_benefits",
+      "label": "Show Product Benefits",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_trust_badges",
+      "label": "Show Trust Badges",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Main"
+    }
+  ]
+}
+{% endschema %}
